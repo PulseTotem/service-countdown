@@ -18,15 +18,13 @@ class Manager extends SourceItf {
 	 * Constructor.
 	 *
 	 * @param {Object} params - Source's params.
-	 * @param {CountdownNamespaceManager} CountdownNamespaceManager - NamespaceManager attached to Source.
+	 * @param {CountdownNamespaceManager} countdownNamespaceManager - NamespaceManager attached to Source.
 	 */
-	constructor(params : any, CountdownNamespaceManager : CountdownNamespaceManager) {
-		super(params, CountdownNamespaceManager);
-
-		Logger.debug("Manager - Params", params);
+	constructor(params : any, countdownNamespaceManager : CountdownNamespaceManager) {
+		super(params, countdownNamespaceManager);
 
 		if (this.checkParams(["InfoDuration", "Limit"])) {
-			CountdownNamespaceManager.setParams(params);
+			countdownNamespaceManager.setParams(params);
 			this.run();
 		}
 	}
@@ -37,14 +35,17 @@ class Manager extends SourceItf {
 	 * @method run
 	 */
 	public run() {
-		var cmd : Cmd = new Cmd(uuid.v1());
+		var cmdId = uuid.v1();
+		var countdownNamespaceManager : any = this.getSourceNamespaceManager();
+		countdownNamespaceManager.setCmdId(cmdId);
+
+		var cmd : Cmd = new Cmd(cmdId);
 		cmd.setDurationToDisplay(parseInt(this.getParams().InfoDuration));
 		cmd.setCmd("Wait");
 		var args : Array<string> = new Array<string>();
-		args.push(this.getSourceNamespaceManager().socket.id);
 		cmd.setArgs(args);
 
-		var list : CmdList = new CmdList(uuid.v1());
+		var list : CmdList = new CmdList(cmdId);
 		list.addCmd(cmd);
 
 		this.getSourceNamespaceManager().sendNewInfoToClient(list);

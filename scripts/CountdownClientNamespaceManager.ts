@@ -3,9 +3,6 @@
  */
 
 /// <reference path="../t6s-core/core-backend/scripts/server/NamespaceManager.ts" />
-/// <reference path="../t6s-core/core-backend/scripts/session/SessionNamespaceManagerItf.ts" />
-/// <reference path="../t6s-core/core-backend/scripts/session/Session.ts" />
-/// <reference path="../t6s-core/core-backend/scripts/session/SessionStatus.ts" />
 
 /// <reference path="./sources/Manager.ts" />
 /// <reference path="./CountdownNamespaceManager.ts" />
@@ -15,17 +12,16 @@
  *
  * @class CountdownClientNamespaceManager
  * @extends NamespaceManager
- * @implements SessionNamespaceManagerItf
  */
-class CountdownClientNamespaceManager extends NamespaceManager implements SessionNamespaceManagerItf {
+class CountdownClientNamespaceManager extends NamespaceManager {
 
 	/**
-	 * Call NamespaceManager.
+	 * Countdown Client 's ProfilId
 	 *
-	 * @property _callNamespaceManager
-	 * @type CountdownNamespaceManager
+	 * @property _profilId
+	 * @type string
 	 */
-	private _callNamespaceManager : CountdownNamespaceManager;
+	private _profilId : string;
 
 	/**
 	 * Constructor.
@@ -36,87 +32,71 @@ class CountdownClientNamespaceManager extends NamespaceManager implements Sessio
 	constructor(socket : any) {
 		super(socket);
 
-		this._callNamespaceManager = null;
-
-		this.addListenerToSocket('TakeControl', function(callSocketId : any, self : CountdownClientNamespaceManager) { self.takeControl(callSocketId); });
+		this.addListenerToSocket('SetProfilId', function(profilId : any, self : CountdownClientNamespaceManager) { self.setProfilId(profilId); });
+		this.addListenerToSocket('Wait', function(countdown : any, self : CountdownClientNamespaceManager) { self.wait(countdown); });
+		this.addListenerToSocket('Run', function(countdown : any, self : CountdownClientNamespaceManager) { self.run(countdown); });
+		this.addListenerToSocket('Pause', function(countdown : any, self : CountdownClientNamespaceManager) { self.pause(countdown); });
 	}
 
 	/**
-	 * Search for callSocket and init a Session to take control on screen.
+	 * Method called to broadcast message to screen with specified profilId.
 	 *
-	 * @method takeControl
-	 * @param {Object} callSocketId - A JSON object with callSocket's Id.
+	 * @method broadcastToAllScreens
+	 * @param {string} cmd - cmd description
+	 * @param {any} content - cmd argument
 	 */
-	takeControl(callSocketId : any) {
+	broadcastToAllScreens(cmd : string, content : any) {
 		var self = this;
 
 		for(var iNM in self.server().namespaceManagers) {
 			var namespaceManager : any = self.server().namespaceManagers[iNM];
-			if(typeof(namespaceManager["getParams"] != "undefined")) {
+			if(typeof(namespaceManager["getParams"]) != "undefined") {
 				var params : any = namespaceManager.getParams();
 
-				Logger.debug("CountdownClientNamespaceManager - takeControl : params", params);
+				if(params.SDI.profilId == parseInt(self._profilId)) {
+					namespaceManager.onExternalMessage(cmd, content);
+				}
 			}
 		}
-
-		/*var callNamespaceManager = self.server().retrieveNamespaceManagerFromSocketId(callSocketId.callSocketId);
-
-		if(callNamespaceManager == null) {
-			self.socket.emit("ControlSession", self.formatResponse(false, "NamespaceManager corresponding to callSocketid '" + callSocketId.callSocketId + "' doesn't exist."));
-		} else {
-			self._callNamespaceManager = callNamespaceManager;
-
-			var newSession : Session = callNamespaceManager.newSession(self);
-
-			self.socket.emit("ControlSession", self.formatResponse(true, newSession));
-
-			var backgroundInfo = { "backgroundURL": this._callNamespaceManager.getParams().BackgroundURL };
-			self.socket.emit("SetBackground", self.formatResponse(true, backgroundInfo));
-		}*/
 	}
 
 	/**
-	 * Lock the control of the Screen for the Session in param.
+	 * Set the client profilId..
 	 *
-	 * @method lockControl
-	 * @param {Session} session - Session which takes the control of the Screen.
+	 * @method setProfilId
+	 * @param {Object} profilId - A JSON object with profil's Id.
 	 */
-	lockControl(session : Session) {
-		var self = this;
-
-		//self.socket.emit("LockedControl", self.formatResponse(true, session));
-
-		Logger.debug("CountdownClientNamespaceManager : lockControl");
+	setProfilId(profilIdObj : any) {
+		this._profilId = profilIdObj.profilId;
 	}
 
 	/**
-	 * Unlock the control of the Screen for the Session in param.
+	 * Manage 'Wait' message.
 	 *
-	 * @method unlockControl
-	 * @param {Session} session - Session which takes the control of the Screen.
+	 * @method wait
+	 * @param {Object} countdown - A JSON object representing countdown.
 	 */
-	unlockControl(session : Session) {
-		var self = this;
-
-		//self.socket.emit("UnlockedControl", self.formatResponse(true, session));
-
-		Logger.debug("CountdownClientNamespaceManager : unlockControl");
+	wait(countdown : any) {
+		this.broadcastToAllScreens("wait", countdown);
 	}
 
 	/**
-	 * Method called when socket is disconnected.
+	 * Manage 'Run' message.
 	 *
-	 * @method onClientDisconnection
+	 * @method run
+	 * @param {Object} countdown - A JSON object representing countdown.
 	 */
-	onClientDisconnection() {
-		var self = this;
+	run(countdown : any) {
+		this.broadcastToAllScreens("run", countdown);
+	}
 
-		this.onDisconnection();
-
-		/*if(self._callNamespaceManager != null) {
-			self._callNamespaceManager.getSessionManager().finishActiveSession();
-		}*/
-
-		Logger.debug("CountdownClientNamespaceManager : onClientDisconnection");
+	/**
+	 * Manage 'Pause' message.
+	 *
+	 * @method pause
+	 * @param {Object} countdown - A JSON object representing countdown.
+	 */
+	pause(countdown : any) {
+		this.broadcastToAllScreens("pause", countdown);
 	}
 }
