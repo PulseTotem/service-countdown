@@ -69,4 +69,13 @@ class CountdownNamespaceManager extends SourceNamespaceManager {
 
 		this.sendNewInfoToClient(list);
 	}
+
+	/**
+	 * Method called when socket is disconnected.
+	 *
+	 * @method onClientDisconnection
+	 */
+	onClientDisconnection() {
+		super.onClientDisconnection();
+	}
 }

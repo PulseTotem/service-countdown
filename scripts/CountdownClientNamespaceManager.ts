@@ -110,4 +110,15 @@ class CountdownClientNamespaceManager extends NamespaceManager {
 	pause(countdown : any) {
 		this.broadcastToAllScreens("pause", countdown);
 	}
+
+	/**
+	 * Method called when socket is disconnected.
+	 *
+	 * @method onClientDisconnection
+	 */
+	onClientDisconnection() {
+		var self = this;
+
+		this.onDisconnection();
+	}
 }
