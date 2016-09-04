@@ -58,7 +58,7 @@ class CountdownNamespaceManager extends SourceNamespaceManager {
 	onExternalMessage(from : string, message : any) {
 		var cmd:Cmd = new Cmd(this._cmdId);
 		cmd.setPriority(InfoPriority.HIGH);
-		cmd.setDurationToDisplay(3600);
+		cmd.setDurationToDisplay(86400);
 		cmd.setCmd(from);
 		var args:Array<string> = new Array<string>();
 		args.push(message);

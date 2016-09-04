@@ -34,6 +34,7 @@ class CountdownClientNamespaceManager extends NamespaceManager {
 
 		this.addListenerToSocket('SetProfilId', function(profilId : any, self : CountdownClientNamespaceManager) { self.setProfilId(profilId); });
 		this.addListenerToSocket('Wait', function(countdown : any, self : CountdownClientNamespaceManager) { self.wait(countdown); });
+		this.addListenerToSocket('Ready', function(countdown : any, self : CountdownClientNamespaceManager) { self.ready(countdown); });
 		this.addListenerToSocket('Run', function(countdown : any, self : CountdownClientNamespaceManager) { self.run(countdown); });
 		this.addListenerToSocket('Pause', function(countdown : any, self : CountdownClientNamespaceManager) { self.pause(countdown); });
 	}
@@ -78,6 +79,16 @@ class CountdownClientNamespaceManager extends NamespaceManager {
 	 */
 	wait(countdown : any) {
 		this.broadcastToAllScreens("wait", countdown);
+	}
+
+	/**
+	 * Manage 'Ready' message.
+	 *
+	 * @method ready
+	 * @param {Object} countdown - A JSON object representing countdown.
+	 */
+	ready(countdown : any) {
+		this.broadcastToAllScreens("ready", countdown);
 	}
 
 	/**

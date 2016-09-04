@@ -23,7 +23,7 @@ class Manager extends SourceItf {
 	constructor(params : any, countdownNamespaceManager : CountdownNamespaceManager) {
 		super(params, countdownNamespaceManager);
 
-		if (this.checkParams(["InfoDuration", "Limit"])) {
+		if (this.checkParams(["InfoDuration", "Limit", "Logo", "Title", "Content"])) {
 			countdownNamespaceManager.setParams(params);
 			this.run();
 		}
@@ -41,8 +41,14 @@ class Manager extends SourceItf {
 
 		var cmd : Cmd = new Cmd(cmdId);
 		cmd.setDurationToDisplay(parseInt(this.getParams().InfoDuration));
-		cmd.setCmd("Wait");
+		cmd.setCmd("init");
 		var args : Array<string> = new Array<string>();
+		var countdownDesc : any = {
+			logo : this.getParams().Logo,
+			title : this.getParams().Title,
+			content : this.getParams().Content
+		};
+		args.push(countdownDesc);
 		cmd.setArgs(args);
 
 		var list : CmdList = new CmdList(cmdId);
