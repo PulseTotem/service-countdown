@@ -37,7 +37,7 @@ class Manager extends SourceItf {
 	public run() {
 		var countdownNamespaceManager : any = this.getSourceNamespaceManager();
 
-		if(countdownNamespaceManager.getCmd() == null) {
+		if(countdownNamespaceManager.getCmdId() == null) {
 			var cmdId = uuid.v1();
 			countdownNamespaceManager.setCmdId(cmdId);
 			var cmd:Cmd = new Cmd(cmdId);
