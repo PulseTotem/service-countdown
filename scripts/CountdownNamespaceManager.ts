@@ -35,17 +35,27 @@ class CountdownNamespaceManager extends SourceNamespaceManager {
      */
     constructor(socket : any) {
         super(socket);
+		this._cmdId = null;
 	    this.addListenerToSocket('Manager', function(params : any, self : CountdownNamespaceManager) { (new Manager(params, self)) });
     }
 
 	/**
-	 * Set the client profilId..
+	 * Set the cmdId.
 	 *
 	 * @method setCmdId
 	 * @param {string} cmdId - Cmd's Id.
 	 */
 	setCmdId(cmdId : string) {
 		this._cmdId = cmdId;
+	}
+
+	/**
+	 * Return the cmdId.
+	 *
+	 * @method getCmdId
+	 */
+	getCmdId() {
+		return this._cmdId;
 	}
 
 	/**
