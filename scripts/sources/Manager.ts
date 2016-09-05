@@ -35,25 +35,27 @@ class Manager extends SourceItf {
 	 * @method run
 	 */
 	public run() {
-		var cmdId = uuid.v1();
 		var countdownNamespaceManager : any = this.getSourceNamespaceManager();
-		countdownNamespaceManager.setCmdId(cmdId);
 
-		var cmd : Cmd = new Cmd(cmdId);
-		cmd.setDurationToDisplay(parseInt(this.getParams().InfoDuration));
-		cmd.setCmd("init");
-		var args : Array<string> = new Array<string>();
-		var countdownDesc : any = {
-			logo : this.getParams().Logo,
-			title : this.getParams().Title,
-			content : this.getParams().Content
-		};
-		args.push(countdownDesc);
-		cmd.setArgs(args);
+		if(countdownNamespaceManager.getCmd() == null) {
+			var cmdId = uuid.v1();
+			countdownNamespaceManager.setCmdId(cmdId);
+			var cmd:Cmd = new Cmd(cmdId);
+			cmd.setDurationToDisplay(parseInt(this.getParams().InfoDuration));
+			cmd.setCmd("init");
+			var args:Array<string> = new Array<string>();
+			var countdownDesc:any = {
+				logo: this.getParams().Logo,
+				title: this.getParams().Title,
+				content: this.getParams().Content
+			};
+			args.push(countdownDesc);
+			cmd.setArgs(args);
 
-		var list : CmdList = new CmdList(cmdId);
-		list.addCmd(cmd);
+			var list:CmdList = new CmdList(cmdId);
+			list.addCmd(cmd);
 
-		this.getSourceNamespaceManager().sendNewInfoToClient(list);
+			this.getSourceNamespaceManager().sendNewInfoToClient(list);
+		}
 	}
 }
